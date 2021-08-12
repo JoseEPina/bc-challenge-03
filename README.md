@@ -37,10 +37,8 @@ The following image demonstrates the application functionality:
 
 ## Project URLs
 
- - The URL of the deployed application: https://github.com/JoseEPina/bc-challenge-03/index.html
+ ### The URL of the deployed application: 
+ https://joseepina.github.io/bc-challenge-03/
 
- - The URL of the GitHub repository: https://github.com/JoseEPina/bc-challenge-03
-
----
-
-© 2021 Trilogy Education Services, LLC, a 2U, Inc. brand. Confidential and Proprietary. All Rights Reserved.
+ ### The URL of the GitHub repository: 
+ https://github.com/JoseEPina/bc-challenge-03
