@@ -37,9 +37,9 @@ The following image demonstrates the application functionality:
 
 ## Project URLs
 
- - The URL of the deployed application:
+ - The URL of the deployed application: https://github.com/JoseEPina/bc-challenge-03/index.html
 
- - The URL of the GitHub repository:
+ - The URL of the GitHub repository: https://github.com/JoseEPina/bc-challenge-03
 
 ---
 
