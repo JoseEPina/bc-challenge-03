@@ -1,24 +1,22 @@
 // Assignment Code
-var generateBtn = document.querySelector("#generate");
-
+var generateBtn = document.querySelector("#generate"); //Associates html id = "#generate" with the variable generateBtn.
+// Number of Criteria: Lowercase, Uppercase, Numbers, Special Characters.
 const NUMBER_OF_CRITERIA = 4;
 // const value of True to validate user 'selected' criteria
 const YES = true;
-
+// to store valid password length.
 var passwordLength = 0;
+// 'Super' Set of Characters that MERGES the set(s) of characters for ALL selected Criteria.
+var superSetOfChars = [];
 
 // Criteria Object:
 // name - Criteria Name
 // selected - was this criteria selected for Pwd? (Yes/No)
-// totalCharsInPwd - random # of total criteria chars TO BE used in Pwd
-// assignedCharsInPwd - current number of criteria chars used in Pwd
 // setOfChars - define set of chars for this criteria
 var criteria = [
    {
       name: "lower-case", // Criteria Name
       selected: false, // Criteria Selected Yes/No
-      totalCharsInPwd: 0, // Random# of Criteria Chars used in Pwd
-      assignedCharsInPwd: 0, // Actual Criteria Chars used in Pwd
       setOfChars: [
          "a",
          "b",
@@ -47,13 +45,10 @@ var criteria = [
          "y",
          "z",
       ],
-      setLength: 26,
    },
    {
       name: "upper-case",
       selected: false,
-      totalCharsInPwd: 0,
-      assignedCharsInPwd: 0,
       setOfChars: [
          "A",
          "B",
@@ -82,13 +77,10 @@ var criteria = [
          "Y",
          "Z",
       ],
-      setLength: 26,
    },
    {
       name: "special-characters",
       selected: false,
-      totalCharsInPwd: 0,
-      assignedCharsInPwd: 0,
       setOfChars: [
          "!",
          "(",
@@ -113,20 +105,17 @@ var criteria = [
          "+",
          "=",
       ],
-      setLength: 22,
    },
    {
       name: "numeric",
       selected: false,
-      totalCharsInPwd: 0,
-      assignedCharsInPwd: 0,
       setOfChars: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
-      setLength: 10,
    },
 ];
 
 // Presents prompts in a Loop
 var presentPrompts = function () {
+   superSetOfChars = [];
    console.log("Inside presentPrompts");
    // debugger;
    // Assumption that user did not select any Criteria
@@ -138,7 +127,12 @@ var presentPrompts = function () {
       criteria[i].selected = window.confirm("Do you want to use " + criteria[i].name + " characters in the password?");
       // If at least one user input is Yes/True, then noneSelected assumption is False.
       if (criteria[i].selected == YES) {
+         // MERGE setofChars of selected criteria with the superSetofChars (using the spread operator ...)
+         superSetOfChars = [...criteria[i].setOfChars, ...superSetOfChars];
+         // noneSelected assumption is false, AT LEAST ONE criteria was selected.
          noneSelected = false;
+         console.log(i, criteria[i].setOfChars);
+         console.log(superSetOfChars);
       }
    }
    // If assumption is True (and No Criteria was selected), then send an alert message and prompt again.
@@ -157,9 +151,13 @@ var promptPasswordLength = function () {
    const PWD_LENGTH_MAX = 128;
 
    // Read Password Lenth (in Number formm not string)
-   var passwordLength = parseInt(
+   passwordLength = parseInt(
       window.prompt(
-         "What length do you need your password to be? Minimum is 8 characters long. Maximum is 128 characters long."
+         "What length do you need your password to be? Minimum is " +
+            PWD_LENGTH_MIN +
+            " characters long. Maximum is " +
+            PWD_LENGTH_MAX +
+            " characters long."
       )
    );
    // Validates for out of range password length(number), empty, or non-numeric input(spaces, other chars, etc).
@@ -169,91 +167,77 @@ var promptPasswordLength = function () {
       promptPasswordLength();
    }
    console.log(passwordLength);
-   return passwordLength;
 };
 
-var calculateCriteriaLength = function () {
-   // Determine count of selected criteria
-   var countedSelectedCriteria = 0;
-   for (var i = 0; i < NUMBER_OF_CRITERIA; i++) {
-      if (criteria[i].selected === YES) {
-         countedSelectedCriteria++;
-      }
-   }
+// var calculateCriteriaLength = function () {
+//    // Determine count of selected criteria
+//    var countedSelectedCriteria = 0;
+//    for (var i = 0; i < NUMBER_OF_CRITERIA; i++) {
+//       if (criteria[i].selected === YES) {
+//          countedSelectedCriteria++;
+//       }
+//    }
 
-   // Determine each Criteria Characters' group size
-   var equalSize = Math.floor(passwordLength / countedSelectedCriteria);
-   // Adjust criteria size of password Length to compensate for Math.floor
-   var adjustedSize = passwordLength - equalSize * (countedSelectedCriteria - 1);
+//    // Determine each Criteria Characters' group size
+//    var equalSize = Math.floor(passwordLength / countedSelectedCriteria);
+//    // Adjust criteria size of password Length to compensate for Math.floor
+//    var adjustedSize = passwordLength - equalSize * (countedSelectedCriteria - 1);
 
-   // Controls processing of groups with equal and different size of characters (due to use of Math.floor)
-   var auxIndex = 1;
-   // Loop to process object criteria array and assign max number of random characters per criteria selected
-   for (var i = 0; i < NUMBER_OF_CRITERIA; i++) {
-      // Process only if criteria was selected.
-      if (criteria[i].selected == YES) {
-         // Process all criteria except last one.
-         if (auxIndex < countedSelectedCriteria) {
-            criteria[i].totalCharsInPwd = equalSize;
-         } else {
-            // Process last criteria.
-            criteria[i].totalCharsInPwd = adjustedSize;
-         }
-         auxIndex++;
-      }
-   }
-};
+//    // Controls processing of groups with equal and different size of characters (due to use of Math.floor)
+//    var auxIndex = 1;
+//    // Loop to process object criteria array and assign max number of random characters per criteria selected
+//    for (var i = 0; i < NUMBER_OF_CRITERIA; i++) {
+//       // Process only if criteria was selected.
+//       if (criteria[i].selected == YES) {
+//          // Process all criteria except last one.
+//          if (auxIndex < countedSelectedCriteria) {
+//             criteria[i].totalCharsInPwd = equalSize;
+//          } else {
+//             // Process last criteria.
+//             criteria[i].totalCharsInPwd = adjustedSize;
+//          }
+//          auxIndex++;
+//       }
+//    }
+// };
 
 var buildPassword = function () {
-   // initialize local password variable.
+   console.log("inside buildPassword function");
+   // Declare local variable for password
    var password = "";
-   // Loop to begin 'building' Pwd, ONE character at a time until we reach total PwdLength.
+   // Loop through total passwordLength to obtain a new Index number pointing to the randomly assigned character.
    for (var i = 0; i < passwordLength; i++) {
-      // Randomly select one of the user's Criteria. This will ensure that we don't USE all the characters of ONE Criteria all together at once.
-      var randomSet = Math.floor(Math.random() * (countedSelectedCriteria - 1)) + 1;
+      // Index variable to choose random characters from new superSetOfChars array.
+      var superSetIndex = Math.floor(Math.random() * superSetOfChars.length);
 
-      // Local auxiliary index; To help find the matching Criteria array index position that corresponds with the randomSet.
-      var auxIndex = 0;
-      // Loops through Criteria array object and validate if index position corresponds with randomSet.
-      for (var j = 0; j < NUMBER_OF_CRITERIA; j++) {
-         if (criteria[j].selected === YES) {
-            auxIndex++; // Increment auxIndex for each selected criteria
-         }
-
-         // Check for condition When array index position corresponds with the randomSet.
-         if (auxIndex === randomSet) {
-            // Randomly select the index of a character within the (randomSet) criteria's setOfChars.
-            var charIndex = Math.floor(Math.random() * (criteria[j].setLength - 1)) + 1;
-            // Select a random character from random selected Criteria.
-            var character = criteria[j].setOfChars[charIndex];
-            // concatenate character to password.
-            password += character;
-            console.log("exiting If block with break");
-            // Breaks current loop and moves to process next password's character.
-            break;
-         }
-         console.log("finish Loop j");
-      }
+      // Using the new superSetIndex numbers, then assign the randomly selected characters to the password.
+      password = password + superSetOfChars[superSetIndex];
+      console.log(i, password);
    }
+   // Returns built password from loop.
+   return password;
 };
 
 function generatePassword() {
    console.log("Inside generatePassword");
+   // Present and validate prompts for criteria to be used in the password, also builds superSetOfChar
    presentPrompts();
-   passwordLength = promptPasswordLength();
-   calculateCriteriaLength();
-   buildPassword();
+   // Present and validate prompt for password length.
+   promptPasswordLength();
+   // Call func to buildPassword with SuperSetofChars built with selected Criteria's setOfChars
+   var password = buildPassword();
+   // returns built password from previous func.
+   return password;
 }
 
 // Write password to the #password input
 function writePassword() {
-   var password = generatePassword();
+   var password = generatePassword(); // Generates password.
+   // Maps variable passwordText to the html element id= "password"
    var passwordText = document.querySelector("#password");
-
+   // Update html id= "password" content with the newly built password.
    passwordText.value = password;
 }
 
-//debugger;
-
-// Add event listener to generate button
+// Add event listener to generate button, calls writePassword on button "click", waits until click on "Generate Password" button.
 generateBtn.addEventListener("click", writePassword);
